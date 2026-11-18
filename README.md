@@ -85,22 +85,6 @@ Downloads: `%APPDATA%\CoBrowser\Downloads` with completion history in `download-
 Google token: DPAPI-encrypted `google-auth.bin` under app data.  
 The build never imports data from an installed Google Chrome profile.
 
-## Version 1.5.0 notes
-
-- Fixed the missing `System.IO` import in Google OAuth callback/session file operations and clarified callback request parsing.
-- Sign-in asks users for a Google email only; OAuth app configuration remains publisher-side.
-- Added a functioning download handler, recent-download flyout and dedicated Downloads tab with progress and file actions.
-- Continued the Chrome + Microsoft Bing theme: Chrome dark neutrals with Bing blue/teal accents.
-- Details: `CHANGELOG-1.5.0.md`.
-
-### Earlier 1.3.1 notes
-
-- Single `dotnet` solution entry point for the Windows browser and Electron installer packaging.
-- Updated CoBrowser identity/icon resources and WPF visual theme.
-- Mandatory first-run Google identity link on Windows using desktop OAuth + PKCE.
-- Electron setup application with destination picker, progress UI and shortcuts.
-- 
-
 ## CoBrowser 1.0.1
 
 - Product version corrected to 1.0.1 across Windows metadata, installer and release assets.
