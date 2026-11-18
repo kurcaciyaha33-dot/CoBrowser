@@ -85,6 +85,7 @@ Downloads: `%APPDATA%\CoBrowser\Downloads` with completion history in `download-
 Google token: DPAPI-encrypted `google-auth.bin` under app data.  
 The build never imports data from an installed Google Chrome profile.
 
+<<<<<<< HEAD
 ## Version 1.5.0 notes
 
 - Fixed the missing `System.IO` import in Google OAuth callback/session file operations and clarified callback request parsing.
@@ -102,6 +103,9 @@ The build never imports data from an installed Google Chrome profile.
 - 
 
 ## CoBrowser 1.0.5
+=======
+## CoBrowser 1.0.1
+>>>>>>> 1f6ab7a (Update README.md)
 
 - Product version corrected to 1.0.5 across Windows metadata, installer and release assets.
 - Unified visual direction: Chromium/Chrome-inspired tab and toolbar layout with Microsoft Bing blue/teal accents.
