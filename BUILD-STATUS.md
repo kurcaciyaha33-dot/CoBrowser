@@ -1,9 +1,10 @@
-# CoBrowser 1.0.5 — Windows-only — build and verification status
+# CoBrowser 1.0.5 — Windows x64 / ARM64 source update
 
-- Windows source: WPF + CefSharp/Chromium, original CoBrowser vector icon set, logo, multi-resolution ICO and embedded image resources.
-- Windows startup: staged diagnostics, explicit CEF lifecycle ownership, single-instance lock and persistent user profile.
-- Google email sign-in: Gmail and Google Workspace/external Google Account email input; Google system-browser authorization-code + PKCE, ephemeral loopback callback, verified email matching, and DPAPI-protected local refresh token/profile. OAuth app Client ID is publisher-side configuration only; the user does not enter it.
-- Downloads: CefSharp download handler writes to `%APPDATA%\CoBrowser\Downloads`; toolbar flyout and Downloads tab share live progress, file size/speed, completion state, open-file and show-in-folder actions.
-- Theme: Chrome-inspired tab/toolbar surfaces with Microsoft Bing blue/teal accents; persistent System, Light and Dark modes. Bing is the default search provider, with Google selectable in the browser menu.
-- Electron setup: custom CoBrowser UI, destination picker, progress screen, shortcuts and uninstall command. Node.js/npm and network access are required to package it.
-- Verification: XAML/XML, project XML, JSON, Python and workflow YAML syntax checks pass. A full Windows build and CefSharp runtime test were not run because the .NET SDK and Windows runtime are unavailable. Build on Windows using `docs/BUILD.md` before release.
+This source update includes popup-to-tab routing, direct downloads to the current user's Downloads folder, and packaging of the installer artwork.
+
+## Validation performed in this environment
+- JavaScript syntax checks passed for the Electron build, main process, and renderer scripts.
+- Workflow asset names and version metadata were updated to 1.0.5.
+- Installer package configuration now includes `assets/**/*`, which contains the setup window's logo images and ICO.
+- A .NET build and Electron packaging run were not performed here because the .NET SDK is not installed in this environment.
+- Windows runtime behavior, including CefSharp popup/download behavior and native ARM64 dependency support, must be confirmed by the Windows GitHub Actions build and runtime test.

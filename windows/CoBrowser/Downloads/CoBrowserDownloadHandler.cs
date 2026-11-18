@@ -3,7 +3,7 @@ using CefSharp.Handler;
 
 namespace CoBrowser.Downloads;
 
-/// <summary>Writes Chromium downloads directly to the signed-in Windows user's Downloads folder.</summary>
+/// <summary>Downloads directly to the current Windows user's Downloads folder.</summary>
 public sealed class CoBrowserDownloadHandler : DownloadHandler
 {
     private readonly DownloadManager _manager;
@@ -17,21 +17,19 @@ public sealed class CoBrowserDownloadHandler : DownloadHandler
         IBeforeDownloadCallback callback)
     {
         if (callback.IsDisposed) return false;
+
         try
         {
             var path = _manager.PrepareDownload(downloadItem);
-            App.Log($"Accepting download: {downloadItem.SuggestedFileName} -> {path}");
-            using (callback)
-            {
-                callback.Continue(path, showDialog: false);
-            }
+            callback.Continue(path, showDialog: false);
+            App.Log($"CEF accepted download destination: {path}; id={downloadItem.Id}");
             return true;
         }
         catch (Exception ex)
         {
-            App.LogException(ex, "Prepare browser download");
-            // Do not fall back to a relative filename/current working directory.
-            // A failed target selection is reported and the download is cancelled safely.
+            App.LogException(ex, "Prepare browser download; download was not silently redirected");
+            // Do not pass a bare filename to CEF: that can place the file in an unexpected
+            // working directory. Returning false makes the failure explicit in the CEF log.
             return false;
         }
     }
@@ -42,14 +40,7 @@ public sealed class CoBrowserDownloadHandler : DownloadHandler
         DownloadItem downloadItem,
         IDownloadItemCallback callback)
     {
-        try
-        {
-            _manager.UpdateDownload(downloadItem);
-            if (downloadItem.IsComplete)
-                App.Log($"Download completed: {downloadItem.SuggestedFileName}; bytes={downloadItem.ReceivedBytes}");
-            else if (downloadItem.IsCancelled)
-                App.Log($"Download cancelled: {downloadItem.SuggestedFileName}");
-        }
+        try { _manager.UpdateDownload(downloadItem); }
         catch (Exception ex) { App.LogException(ex, "Update browser download progress"); }
     }
 }

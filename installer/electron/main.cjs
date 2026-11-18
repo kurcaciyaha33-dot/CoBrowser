@@ -143,7 +143,7 @@ ipcMain.handle('installer:install', async (_event, targetPath, createDesktopShor
     const uninstallKey = String.raw`HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\CoBrowser`;
     const registryValues = [
       ['DisplayName', 'CoBrowser'],
-      ['DisplayVersion', app.getVersion()],
+      ['DisplayVersion', '1.0.5'],
       ['Publisher', 'CoCo X Who?'],
       ['InstallLocation', targetPath],
       ['DisplayIcon', exePath],

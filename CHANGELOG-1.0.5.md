@@ -1,7 +1,7 @@
 # CoBrowser 1.0.5
 
-- Route links opened with target=_blank and window.open into a new CoBrowser tab instead of a separate native window.
-- Store browser downloads in the current Windows user's `%USERPROFILE%\Downloads` folder.
-- Improve download target selection, logging, and failure handling.
-- Refresh installer icon assets and explicitly configure Electron Builder Windows icon resources.
-- Update product, installer, and release artifact version to 1.0.5.
+- Chromium popup requests (`window.open`, `target=_blank`, and links opened in a new window) are routed into a new CoBrowser tab instead of a separate window.
+- Browser downloads are saved directly in the signed-in Windows user's `Downloads` folder.
+- Download callbacks now log the selected destination and no longer silently fall back to an ambiguous relative filename.
+- Fixed the setup's missing internal brand images by including the installer assets directory in the packaged Electron application.
+- Updated product, installer, and release asset version metadata to 1.0.5.

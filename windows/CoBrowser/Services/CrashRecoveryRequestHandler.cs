@@ -3,26 +3,9 @@ using CefSharp.Handler;
 
 namespace CoBrowser.Services;
 
-/// <summary>Routes Chromium target=_blank/window.open requests into CoBrowser tabs and records renderer crashes.</summary>
-public sealed class CrashRecoveryRequestHandler(
-    Action<string> onRendererTerminated,
-    Action<string> openInNewTab) : RequestHandler
+/// <summary>Records Chromium renderer crashes so they can be distinguished from a full CoBrowser process exit.</summary>
+public sealed class CrashRecoveryRequestHandler(Action<string> onRendererTerminated) : RequestHandler
 {
-    protected override bool OnOpenUrlFromTab(
-        IWebBrowser chromiumWebBrowser,
-        IBrowser browser,
-        IFrame frame,
-        string targetUrl,
-        WindowOpenDisposition targetDisposition,
-        bool userGesture)
-    {
-        if (string.IsNullOrWhiteSpace(targetUrl)) return true;
-        try { openInNewTab(targetUrl); }
-        catch (Exception ex) { App.LogException(ex, "Open popup URL in new tab"); }
-        // Returning true prevents Chromium from creating a separate native window.
-        return true;
-    }
-
     protected override void OnRenderProcessTerminated(
         IWebBrowser chromiumWebBrowser,
         IBrowser browser,

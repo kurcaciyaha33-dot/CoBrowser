@@ -24,7 +24,7 @@
 
   <Target Name="BuildCoBrowserElectronInstaller">
     <Message Importance="high" Text="Building Electron installer UI. Node.js and npm are required..." />
-    <Exec Command="node &quot;$(ProjectRoot)/installer/electron/build.cjs&quot; --payload &quot;$(ArtifactsRoot)/windows&quot; --arch x64" />
+    <Exec Command="node &quot;$(ProjectRoot)/installer/electron/build.cjs&quot; --payload &quot;$(ArtifactsRoot)/windows&quot;" />
     <MakeDir Directories="$(ArtifactsRoot)/installer" />
     <Copy SourceFiles="$(ProjectRoot)/installer/electron/dist/CoBrowser-Setup-1.0.5-x64.exe" DestinationFolder="$(ArtifactsRoot)/installer" />
     <Message Importance="high" Text="Electron installer: $(ArtifactsRoot)/installer/CoBrowser-Setup-1.0.5-x64.exe" />

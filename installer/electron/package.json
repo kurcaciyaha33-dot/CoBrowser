@@ -27,6 +27,7 @@
       "main.cjs",
       "preload.cjs",
       "renderer/**/*",
+      "assets/**/*",
       "package.json"
     ],
     "extraResources": [

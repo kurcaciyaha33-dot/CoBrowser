@@ -1,4 +1,4 @@
-# CoBrowser 1.0.1
+# CoBrowser 1.0.5
 
 **Developer:** CoCo X Who?  
 **Windows:** .NET 8 WPF + CefSharp 156 / Chromium  
@@ -57,7 +57,7 @@ dotnet build .\CoBrowser.sln -c Release -p:CoBrowserPlatform=Windows -p:BuildIns
 Installer output:
 
 ```text
-artifacts/installer/CoBrowser-Setup-1.0.1.exe
+artifacts/installer/CoBrowser-Setup-1.0.5-x64.exe
 ```
 
 The Electron installer is a self-contained Electron setup UI packaged as a Windows executable. It copies the published browser payload, creates Start Menu and optional Desktop shortcuts, and leaves the CoBrowser profile under `%APPDATA%\CoBrowser` untouched. It does not require a `.ps1` build script; Node.js/npm are invoked from the .NET build target.
@@ -101,9 +101,9 @@ The build never imports data from an installed Google Chrome profile.
 - Electron setup application with destination picker, progress UI and shortcuts.
 - 
 
-## CoBrowser 1.0.1
+## CoBrowser 1.0.5
 
-- Product version corrected to 1.0.1 across Windows metadata, installer and release assets.
+- Product version corrected to 1.0.5 across Windows metadata, installer and release assets.
 - Unified visual direction: Chromium/Chrome-inspired tab and toolbar layout with Microsoft Bing blue/teal accents.
 - Added persistent System, Light and Dark appearance modes. System follows the Windows app appearance setting and reacts to appearance changes.
 - Bing is the default address-bar search provider; Google remains selectable from the browser menu.

@@ -23,6 +23,8 @@ jobs:
   build:
     name: Build Windows x64 and ARM64
     runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +38,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Resolve release version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace "^v", ""
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$') {
+            $version = node -p "require('./installer/electron/package.json').version"
+          }
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($version)) { throw "Could not resolve CoBrowser version." }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Building CoBrowser version $version"
 
       - name: Validate Google OAuth secrets
         shell: pwsh
@@ -62,13 +76,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "x64 dotnet publish failed." }
           $oauth = @{ installed = @{ client_id = $env:GOOGLE_OAUTH_CLIENT_ID; client_secret = $env:GOOGLE_OAUTH_CLIENT_SECRET } } | ConvertTo-Json -Depth 4 -Compress
           Set-Content -LiteralPath (Join-Path $runtime "google-oauth.json") -Value $oauth -Encoding utf8
-          node .\installer\electron\build.cjs --payload $runtime --arch x64
+          node .\installer\electron\build.cjs --payload $runtime --arch x64 --version ${{ steps.version.outputs.version }}
           if ($LASTEXITCODE -ne 0) { throw "x64 Setup EXE build failed." }
           New-Item -ItemType Directory -Force -Path release-assets | Out-Null
-          $setup = ".\installer\electron\dist\CoBrowser-Setup-1.0.5-x64.exe"
+          $setup = ".\installer\electron\dist\CoBrowser-Setup-${{ steps.version.outputs.version }}-x64.exe"
           if (-not (Test-Path $setup)) { throw "x64 Setup EXE missing: $setup" }
-          Copy-Item $setup "release-assets/CoBrowser-Setup-1.0.5-x64.exe" -Force
-          $portable = "release-assets/CoBrowser-Windows-x64-portable.zip"
+          Copy-Item $setup "release-assets/CoBrowser-Setup-${{ steps.version.outputs.version }}-x64.exe" -Force
+          $portable = "release-assets/CoBrowser-${{ steps.version.outputs.version }}-Windows-x64-portable.zip"
           Compress-Archive -Path "$runtime/*" -DestinationPath $portable -CompressionLevel Optimal -Force
           $verify = Join-Path $env:RUNNER_TEMP "verify-x64"
           Expand-Archive $portable $verify -Force
@@ -87,12 +101,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "ARM64 dotnet publish failed. Check that all native dependencies, especially CefSharp, provide win-arm64 assets." }
           $oauth = @{ installed = @{ client_id = $env:GOOGLE_OAUTH_CLIENT_ID; client_secret = $env:GOOGLE_OAUTH_CLIENT_SECRET } } | ConvertTo-Json -Depth 4 -Compress
           Set-Content -LiteralPath (Join-Path $runtime "google-oauth.json") -Value $oauth -Encoding utf8
-          node .\installer\electron\build.cjs --payload $runtime --arch arm64
+          node .\installer\electron\build.cjs --payload $runtime --arch arm64 --version ${{ steps.version.outputs.version }}
           if ($LASTEXITCODE -ne 0) { throw "ARM64 Setup EXE build failed." }
-          $setup = ".\installer\electron\dist\CoBrowser-Setup-1.0.5-arm64.exe"
+          $setup = ".\installer\electron\dist\CoBrowser-Setup-${{ steps.version.outputs.version }}-arm64.exe"
           if (-not (Test-Path $setup)) { throw "ARM64 Setup EXE missing: $setup" }
-          Copy-Item $setup "release-assets/CoBrowser-Setup-1.0.5-arm64.exe" -Force
-          $portable = "release-assets/CoBrowser-Windows-arm64-portable.zip"
+          Copy-Item $setup "release-assets/CoBrowser-Setup-${{ steps.version.outputs.version }}-arm64.exe" -Force
+          $portable = "release-assets/CoBrowser-${{ steps.version.outputs.version }}-Windows-arm64-portable.zip"
           Compress-Archive -Path "$runtime/*" -DestinationPath $portable -CompressionLevel Optimal -Force
           $verify = Join-Path $env:RUNNER_TEMP "verify-arm64"
           Expand-Archive $portable $verify -Force
@@ -103,10 +117,10 @@ jobs:
         shell: pwsh
         run: |
           $expected = @(
-            "CoBrowser-Setup-1.0.5-x64.exe",
-            "CoBrowser-Windows-x64-portable.zip",
-            "CoBrowser-Setup-1.0.5-arm64.exe",
-            "CoBrowser-Windows-arm64-portable.zip"
+            "CoBrowser-Setup-${{ steps.version.outputs.version }}-x64.exe",
+            "CoBrowser-${{ steps.version.outputs.version }}-Windows-x64-portable.zip",
+            "CoBrowser-Setup-${{ steps.version.outputs.version }}-arm64.exe",
+            "CoBrowser-${{ steps.version.outputs.version }}-Windows-arm64-portable.zip"
           )
           foreach ($name in $expected) {
             $path = Join-Path "release-assets" $name
@@ -139,21 +153,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s release-assets/CoBrowser-Setup-1.0.5-x64.exe
-          test -s release-assets/CoBrowser-Windows-x64-portable.zip
-          test -s release-assets/CoBrowser-Setup-1.0.5-arm64.exe
-          test -s release-assets/CoBrowser-Windows-arm64-portable.zip
+          test -s release-assets/CoBrowser-Setup-${{ needs.build.outputs.version }}-x64.exe
+          test -s release-assets/CoBrowser-${{ needs.build.outputs.version }}-Windows-x64-portable.zip
+          test -s release-assets/CoBrowser-Setup-${{ needs.build.outputs.version }}-arm64.exe
+          test -s release-assets/CoBrowser-${{ needs.build.outputs.version }}-Windows-arm64-portable.zip
           ls -lh release-assets
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: CoBrowser ${{ github.ref_name }}
+          tag_name: v${{ needs.build.outputs.version }}
+          name: CoBrowser ${{ needs.build.outputs.version }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            release-assets/CoBrowser-Setup-1.0.5-x64.exe
-            release-assets/CoBrowser-Windows-x64-portable.zip
-            release-assets/CoBrowser-Setup-1.0.5-arm64.exe
-            release-assets/CoBrowser-Windows-arm64-portable.zip
+            release-assets/CoBrowser-Setup-${{ needs.build.outputs.version }}-x64.exe
+            release-assets/CoBrowser-${{ needs.build.outputs.version }}-Windows-x64-portable.zip
+            release-assets/CoBrowser-Setup-${{ needs.build.outputs.version }}-arm64.exe
+            release-assets/CoBrowser-${{ needs.build.outputs.version }}-Windows-arm64-portable.zip

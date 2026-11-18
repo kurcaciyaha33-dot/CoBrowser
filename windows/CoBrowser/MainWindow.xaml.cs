@@ -43,8 +43,7 @@ public partial class MainWindow : Window
     private double _zoomLevel;
     private bool _googleLoginAcknowledged;
     private readonly GoogleOAuthService _authService;
-    private static readonly string UserDownloadsDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+    private static readonly string UserDownloadsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
     private static readonly DownloadManager SharedDownloadManager = new(UserDownloadsDirectory);
     private readonly DownloadManager _downloadManager = SharedDownloadManager;
     private readonly NotifyCollectionChangedEventHandler _downloadCollectionChanged;
@@ -170,20 +169,18 @@ public partial class MainWindow : Window
 
         var browser = new ChromiumWebBrowser { Address = "about:blank" };
         browser.DownloadHandler = new CoBrowserDownloadHandler(_downloadManager);
-        browser.RequestHandler = new CrashRecoveryRequestHandler(
-            status => PostToUi(() =>
-            {
-                if (!IsLiveTabBrowser(tab, browser)) return;
-                if (Tabs.SelectedItem == tab)
-                    StatusText.Text = "This page stopped unexpectedly. Press Reload to recover.";
-                App.Log($"Renderer recovery available for tab; termination status={status}");
-            }),
-            popupUrl => PostToUi(() =>
-            {
-                if (_isClosing || !IsLiveTabBrowser(tab, browser)) return;
-                AddTab(popupUrl);
-                App.Log($"Opened popup in new CoBrowser tab: {popupUrl}");
-            }));
+        browser.LifeSpanHandler = new CoBrowserLifeSpanHandler(targetUrl => PostToUi(() =>
+        {
+            if (_isClosing || string.IsNullOrWhiteSpace(targetUrl)) return;
+            AddTab(targetUrl);
+        }));
+        browser.RequestHandler = new CrashRecoveryRequestHandler(status => PostToUi(() =>
+        {
+            if (!IsLiveTabBrowser(tab, browser)) return;
+            if (Tabs.SelectedItem == tab)
+                StatusText.Text = "This page stopped unexpectedly. Press Reload to recover.";
+            App.Log($"Renderer recovery available for tab; termination status={status}");
+        }));
         _browsers[tab] = browser;
         _views[tab] = browser;
         browser.Visibility = Visibility.Hidden;
