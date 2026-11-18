@@ -86,6 +86,7 @@ Google token: DPAPI-encrypted `google-auth.bin` under app data.
 The build never imports data from an installed Google Chrome profile.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Version 1.5.0 notes
 
 - Fixed the missing `System.IO` import in Google OAuth callback/session file operations and clarified callback request parsing.
@@ -104,6 +105,8 @@ The build never imports data from an installed Google Chrome profile.
 
 ## CoBrowser 1.0.5
 =======
+=======
+>>>>>>> 1f6ab7afef2691b57dfad3782670c0525744efa1
 ## CoBrowser 1.0.1
 >>>>>>> 1f6ab7a (Update README.md)
 
