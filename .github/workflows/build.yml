@@ -1,0 +1,106 @@
+name: CoBrowser Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: "Create a GitHub Release (tag must already exist)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cobrowser-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Windows x64 + Electron installer
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: installer/electron/package.json
+
+      - name: Restore
+        run: dotnet restore .\CoBrowser.sln
+
+      - name: Build browser runtime with publisher OAuth configuration
+        shell: pwsh
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_OAUTH_CLIENT_ID)) { throw "Missing GitHub Secret: GOOGLE_OAUTH_CLIENT_ID" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_OAUTH_CLIENT_SECRET)) { throw "Missing GitHub Secret: GOOGLE_OAUTH_CLIENT_SECRET" }
+          dotnet build .\CoBrowser.sln -c Release -p:CoBrowserPlatform=Windows
+          if ($LASTEXITCODE -ne 0) { throw "CoBrowser Windows build failed." }
+          $oauth = @{
+            installed = @{
+              client_id = $env:GOOGLE_OAUTH_CLIENT_ID
+              client_secret = $env:GOOGLE_OAUTH_CLIENT_SECRET
+            }
+          } | ConvertTo-Json -Depth 4 -Compress
+          Set-Content -Path "artifacts/windows/google-oauth.json" -Value $oauth -Encoding utf8
+
+      - name: Build Electron installer
+        run: dotnet build .\CoBrowser.sln -c Release -p:CoBrowserPlatform=Windows -p:BuildInstallerOnly=true
+
+      - name: Package Windows artifacts
+        shell: pwsh
+        run: |
+          if (!(Test-Path "artifacts/windows/CoBrowser.exe")) { throw "CoBrowser.exe was not produced." }
+          if (!(Test-Path "artifacts/installer/CoBrowser-Setup-1.0.1.exe")) { throw "CoBrowser installer was not produced." }
+          if (!(Test-Path "artifacts/windows/google-oauth.json")) { throw "Google OAuth configuration was not generated." }
+          $oauth = Get-Content "artifacts/windows/google-oauth.json" -Raw | ConvertFrom-Json
+          if (!$oauth.installed.client_id -or !$oauth.installed.client_secret) { throw "Google OAuth configuration is incomplete." }
+          Compress-Archive -Path "artifacts/windows/*" -DestinationPath "artifacts/CoBrowser-Windows-x64-portable.zip" -Force
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoBrowser-Windows-${{ github.ref_name }}
+          path: |
+            artifacts/CoBrowser-Windows-x64-portable.zip
+            artifacts/installer/CoBrowser-Setup-1.0.1.exe
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: [windows]
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.create_release)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish release with all assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: CoBrowser ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            release-assets/CoBrowser-Windows-x64-portable.zip
+            release-assets/CoBrowser-Setup-1.0.1.exe

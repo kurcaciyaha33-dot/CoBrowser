@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self';">
+  <title>CoBrowser Setup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="window-shell">
+    <header class="titlebar">
+      <div class="brand-mini"><img src="../assets/cobrowser-mark.png" alt=""><span>CoBrowser <i>SETUP</i></span></div>
+      <div class="window-actions"><button id="minimize" aria-label="Minimize">—</button><button id="close" aria-label="Close">×</button></div>
+    </header>
+    <main class="layout">
+      <section class="hero">
+        <div class="orb orb-one"></div><div class="orb orb-two"></div>
+        <div class="brand-lockup"><img src="../assets/cobrowser-mark.png" alt="CoBrowser logo"></div>
+        <div class="eyebrow">A BETTER WAY TO BROWSE</div>
+        <h1>Meet your<br><span>new browser.</span></h1>
+        <p>Fast, focused and built on Chromium. A calmer space for everything you do on the web.</p>
+        <div class="feature-list"><div><b>01</b><span>Chromium-powered browsing</span></div><div><b>02</b><span>Your own encrypted profile</span></div><div><b>03</b><span>Designed by CoCo X Who?</span></div></div>
+        <div class="hero-foot">COBROWSER <span>•</span> VERSION 1.0.1</div>
+      </section>
+      <section class="install-panel">
+        <div class="panel-top"><div class="step">01 <span> / INSTALLATION</span></div><div class="secure"><span></span> LOCAL INSTALL</div></div>
+        <div id="welcome" class="screen active">
+          <h2>Set up CoBrowser</h2>
+          <p class="muted">Choose where CoBrowser should live on this PC.</p>
+          <label class="field-label" for="installPath">INSTALL LOCATION</label>
+          <div class="path-field"><input id="installPath" spellcheck="false"><button id="browse">Browse</button></div>
+          <label class="check-row"><input type="checkbox" id="desktopShortcut" checked><span class="checkmark"></span><span>Create a desktop shortcut</span></label>
+          <div class="info-card"><div class="info-icon">i</div><p>Your browsing profile, Google connection and local data are stored separately in your Windows AppData folder. Updating the app will not replace them.</p></div>
+          <button id="install" class="primary"><span>Install CoBrowser</span><b>↗</b></button>
+          <div class="fine">By continuing, you agree to use CoBrowser responsibly.</div>
+        </div>
+        <div id="progress" class="screen">
+          <div class="loading-mark"><img src="../assets/cobrowser-mark.png" alt=""></div>
+          <h2 id="stageTitle">Installing CoBrowser</h2>
+          <p id="stageDetail" class="muted">Preparing the Chromium runtime…</p>
+          <div class="progress-track"><div id="progressFill"></div></div>
+          <div class="progress-meta"><span>INSTALLING</span><span id="progressPercent">0%</span></div>
+        </div>
+        <div id="complete" class="screen">
+          <div class="success-mark">✓</div>
+          <div class="step">02 <span> / COMPLETE</span></div>
+          <h2>All set.</h2>
+          <p class="muted">CoBrowser is installed and ready to open. Sign in with your Google account on first launch to connect your CoBrowser profile.</p>
+          <div class="installed-path" id="installedPath"></div>
+          <button id="launch" class="primary"><span>Launch CoBrowser</span><b>↗</b></button>
+          <button id="finish" class="secondary">Close installer</button>
+        </div>
+        <div class="panel-footer"><span>CoCo X Who?</span><span>CHROMIUM INSIDE</span></div>
+      </section>
+    </main>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

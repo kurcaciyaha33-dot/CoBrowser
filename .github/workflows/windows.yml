@@ -1,0 +1,23 @@
+name: Windows build
+on:
+  push:
+    paths: ['windows/**', '.github/workflows/windows.yml']
+  pull_request:
+    paths: ['windows/**', '.github/workflows/windows.yml']
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore windows/CoBrowser/CoBrowser.csproj
+      - name: Build
+        run: dotnet publish windows/CoBrowser/CoBrowser.csproj -c Release -r win-x64 --self-contained false -o artifacts/windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoBrowser-Windows-x64
+          path: artifacts/windows/**

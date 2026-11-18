@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/payload/
+artifacts/
+*.user
+*.suo
+*.log
+
+# Publisher-specific public OAuth app configuration
+windows/CoBrowser/google-oauth.json
+

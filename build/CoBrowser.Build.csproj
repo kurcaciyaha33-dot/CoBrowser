@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <CoBrowserPlatform Condition="'$(CoBrowserPlatform)' == ''">Windows</CoBrowserPlatform>
+    <BuildInstaller Condition="'$(BuildInstaller)' == ''">false</BuildInstaller>
+    <BuildInstallerOnly Condition="'$(BuildInstallerOnly)' == ''">false</BuildInstallerOnly>
+    <GoogleOAuthClientId Condition="'$(GoogleOAuthClientId)' == ''">$(GOOGLE_OAUTH_CLIENT_ID)</GoogleOAuthClientId>
+    <ProjectRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</ProjectRoot>
+    <ArtifactsRoot>$(ProjectRoot)/artifacts</ArtifactsRoot>
+  </PropertyGroup>
+
+
+  <Target Name="BuildCoBrowserWindows" AfterTargets="Build" Condition="'$(CoBrowserPlatform)' == 'Windows' and '$(BuildInstallerOnly)' != 'true'">
+    <Message Importance="high" Text="Building CoBrowser Windows (WPF + CefSharp / Chromium) with dotnet publish..." />
+    <Warning Condition="'$(GoogleOAuthClientId)' == '' and !Exists('$(ProjectRoot)/windows/CoBrowser/google-oauth.json')" Text="No publisher Google Desktop OAuth Client ID is configured. The Windows browser can build, but Google email sign-in will stay disabled until google-oauth.json or GoogleOAuthClientId is supplied." />
+    <MakeDir Directories="$(ArtifactsRoot)/windows" />
+    <Exec Command="dotnet publish &quot;$(ProjectRoot)/windows/CoBrowser/CoBrowser.csproj&quot; -c $(Configuration) -r win-x64 --self-contained true -p:PublishSingleFile=false -p:GoogleOAuthClientId=&quot;$(GoogleOAuthClientId)&quot; -o &quot;$(ArtifactsRoot)/windows&quot;" />
+    <Message Importance="high" Text="Windows build output: $(ArtifactsRoot)/windows/CoBrowser.exe" />
+    <CallTarget Targets="BuildCoBrowserElectronInstaller" Condition="'$(BuildInstaller)' == 'true'" />
+  </Target>
+
+  <Target Name="BuildCoBrowserElectronInstaller">
+    <Message Importance="high" Text="Building Electron installer UI. Node.js and npm are required..." />
+    <Exec Command="node &quot;$(ProjectRoot)/installer/electron/build.cjs&quot; --payload &quot;$(ArtifactsRoot)/windows&quot;" />
+    <MakeDir Directories="$(ArtifactsRoot)/installer" />
+    <Copy SourceFiles="$(ProjectRoot)/installer/electron/dist/CoBrowser-Setup-1.0.1.exe" DestinationFolder="$(ArtifactsRoot)/installer" />
+    <Message Importance="high" Text="Electron installer: $(ArtifactsRoot)/installer/CoBrowser-Setup-1.0.1.exe" />
+  </Target>
+
+  <Target Name="BuildCoBrowserInstallerOnly" AfterTargets="Build" Condition="'$(CoBrowserPlatform)' == 'Windows' and '$(BuildInstallerOnly)' == 'true'">
+    <Error Condition="!Exists('$(ArtifactsRoot)/windows/CoBrowser.exe')" Text="Build the browser EXE first: dotnet build CoBrowser.sln -c Release -p:CoBrowserPlatform=Windows" />
+    <CallTarget Targets="BuildCoBrowserElectronInstaller" />
+  </Target>
+<Target Name="ValidateCoBrowserPlatform" BeforeTargets="Build">
+    <Error Condition="'$(CoBrowserPlatform)' != 'Windows'" Text="CoBrowserPlatform must be Windows. CoBrowser is Windows-only." />
+</Target>
+</Project>

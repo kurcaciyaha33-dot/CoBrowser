@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <AssemblyName>CoBrowser</AssemblyName>
+    <RootNamespace>CoBrowser</RootNamespace>
+    <Version>1.0.1</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Product>CoBrowser</Product>
+    <Company>CoCo X Who?</Company>
+    <Authors>CoCo X Who?</Authors>
+    <ApplicationIcon>Assets\cobrowser.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="156.0.150" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\cobrowser.ico" />
+    <Resource Include="Assets\*.png" />
+    <Resource Include="Assets\*.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Publisher Desktop OAuth Client ID is injected from the build environment. The client secret is added
+         by the release workflow after publish; bundled desktop client secrets are not confidential. -->
+    <GoogleOAuthClientId Condition="'$(GoogleOAuthClientId)' == ''">$(GOOGLE_OAUTH_CLIENT_ID)</GoogleOAuthClientId>
+    <GoogleOAuthClientSecret Condition="'$(GoogleOAuthClientSecret)' == ''">$(GOOGLE_OAUTH_CLIENT_SECRET)</GoogleOAuthClientSecret>
+    <None Update="google-oauth.json" Condition="Exists('google-oauth.json')" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="ValidateGoogleOAuthClientId" BeforeTargets="Publish" Condition="'$(GoogleOAuthClientId)' != ''">
+    <Error Condition="!$([System.String]::Copy('$(GoogleOAuthClientId)').EndsWith('.apps.googleusercontent.com'))" Text="GoogleOAuthClientId must be a Google Desktop OAuth Client ID ending in .apps.googleusercontent.com. Do not pass a client secret." />
+  </Target>
+  <Target Name="WriteGoogleOAuthConfiguration" AfterTargets="Publish" Condition="'$(GoogleOAuthClientId)' != ''">
+    <WriteLinesToFile File="$(PublishDir)google-oauth.json" Lines="{ &quot;client_id&quot;: &quot;$(GoogleOAuthClientId)&quot; }" Overwrite="true" Encoding="UTF-8" />
+  </Target>
+</Project>

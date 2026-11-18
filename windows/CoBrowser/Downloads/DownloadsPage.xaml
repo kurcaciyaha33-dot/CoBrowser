@@ -1,0 +1,64 @@
+<UserControl x:Class="CoBrowser.Downloads.DownloadsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource WindowBrush}">
+  <Grid Background="{DynamicResource WindowBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel MaxWidth="1080" HorizontalAlignment="Stretch" Margin="48,34,48,48">
+        <TextBlock Text="Downloads" FontSize="31" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" />
+        <TextBlock Text="Files downloaded with CoBrowser appear here." FontSize="13" Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,24" />
+
+        <DockPanel LastChildFill="False" Margin="0,0,0,18">
+          <StackPanel DockPanel.Dock="Left">
+            <TextBlock Text="Recent downloads" FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" />
+            <TextBlock x:Name="DownloadCountText" Text="0 items" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+          </StackPanel>
+          <Button DockPanel.Dock="Right" Content="Open downloads folder" Style="{DynamicResource SecondaryActionButton}" Padding="14,8" Click="OpenFolder_Click" />
+          <Button DockPanel.Dock="Right" Content="Clear completed" Style="{DynamicResource SecondaryActionButton}" Padding="14,8" Margin="0,0,8,0" Click="ClearCompleted_Click" />
+        </DockPanel>
+
+        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushCo}" BorderThickness="1" CornerRadius="16" Padding="18">
+          <StackPanel>
+            <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" Margin="16,36,16,36">
+              <Border Width="58" Height="58" CornerRadius="18" Background="{DynamicResource ButtonSurfaceBrush}" HorizontalAlignment="Center">
+                <Path Data="M12,3 V15 M7,10 L12,15 L17,10 M4,19 H20" Stroke="{DynamicResource BingTealBrush}" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Width="25" Height="25" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <TextBlock Text="No downloads yet" FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" Margin="0,14,0,5" />
+              <TextBlock Text="When you download a file, its progress and actions will appear here." FontSize="12" Foreground="{DynamicResource MutedBrush}" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="380" />
+            </StackPanel>
+
+            <ItemsControl x:Name="DownloadsList" ItemsSource="{Binding Downloads}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border BorderBrush="{DynamicResource BorderBrushCo}" BorderThickness="0,0,0,1" Padding="8,14">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="42" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <Border Grid.Column="0" Width="34" Height="38" CornerRadius="8" Background="{DynamicResource ButtonSurfaceBrush}" VerticalAlignment="Top">
+                        <Path Data="M7,3 H15 L20,8 V21 H7 Z M15,3 V8 H20 M10,13 H17 M10,17 H17" Stroke="{DynamicResource IconBrush}" StrokeThickness="1.4" StrokeLineJoin="Round" Width="21" Height="23" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Border>
+                      <StackPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding FileName}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+                        <ProgressBar Height="4" Margin="0,9,0,0" Minimum="0" Maximum="100" Value="{Binding PercentComplete}" IsIndeterminate="{Binding IsIndeterminate}" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Open" Tag="{Binding FullPath}" IsEnabled="{Binding CanOpen}" Style="{DynamicResource SecondaryActionButton}" Padding="12,7" Click="OpenFile_Click" />
+                        <Button Content="Show in folder" Tag="{Binding FullPath}" Style="{DynamicResource SecondaryActionButton}" Padding="12,7" Margin="6,0,0,0" Click="ShowInFolder_Click" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <TextBlock Text="Download location" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="2,18,0,5" />
+        <TextBlock Text="{Binding DownloadDirectory}" FontSize="12" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>
