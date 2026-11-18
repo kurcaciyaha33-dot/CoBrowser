@@ -1,8 +1,8 @@
 {
   "name": "cobrowser-electron-installer",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "private": true,
-  "description": "CoBrowser 1.0.1 Windows installer UI",
+  "description": "CoBrowser 1.0.5 Windows installer UI",
   "main": "main.cjs",
   "author": "CoCo X Who?",
   "license": "UNLICENSED",

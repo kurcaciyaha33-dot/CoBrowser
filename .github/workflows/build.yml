@@ -65,9 +65,9 @@ jobs:
           node .\installer\electron\build.cjs --payload $runtime --arch x64
           if ($LASTEXITCODE -ne 0) { throw "x64 Setup EXE build failed." }
           New-Item -ItemType Directory -Force -Path release-assets | Out-Null
-          $setup = ".\installer\electron\dist\CoBrowser-Setup-1.0.1-x64.exe"
+          $setup = ".\installer\electron\dist\CoBrowser-Setup-1.0.5-x64.exe"
           if (-not (Test-Path $setup)) { throw "x64 Setup EXE missing: $setup" }
-          Copy-Item $setup "release-assets/CoBrowser-Setup-1.0.1-x64.exe" -Force
+          Copy-Item $setup "release-assets/CoBrowser-Setup-1.0.5-x64.exe" -Force
           $portable = "release-assets/CoBrowser-Windows-x64-portable.zip"
           Compress-Archive -Path "$runtime/*" -DestinationPath $portable -CompressionLevel Optimal -Force
           $verify = Join-Path $env:RUNNER_TEMP "verify-x64"
@@ -89,9 +89,9 @@ jobs:
           Set-Content -LiteralPath (Join-Path $runtime "google-oauth.json") -Value $oauth -Encoding utf8
           node .\installer\electron\build.cjs --payload $runtime --arch arm64
           if ($LASTEXITCODE -ne 0) { throw "ARM64 Setup EXE build failed." }
-          $setup = ".\installer\electron\dist\CoBrowser-Setup-1.0.1-arm64.exe"
+          $setup = ".\installer\electron\dist\CoBrowser-Setup-1.0.5-arm64.exe"
           if (-not (Test-Path $setup)) { throw "ARM64 Setup EXE missing: $setup" }
-          Copy-Item $setup "release-assets/CoBrowser-Setup-1.0.1-arm64.exe" -Force
+          Copy-Item $setup "release-assets/CoBrowser-Setup-1.0.5-arm64.exe" -Force
           $portable = "release-assets/CoBrowser-Windows-arm64-portable.zip"
           Compress-Archive -Path "$runtime/*" -DestinationPath $portable -CompressionLevel Optimal -Force
           $verify = Join-Path $env:RUNNER_TEMP "verify-arm64"
@@ -103,9 +103,9 @@ jobs:
         shell: pwsh
         run: |
           $expected = @(
-            "CoBrowser-Setup-1.0.1-x64.exe",
+            "CoBrowser-Setup-1.0.5-x64.exe",
             "CoBrowser-Windows-x64-portable.zip",
-            "CoBrowser-Setup-1.0.1-arm64.exe",
+            "CoBrowser-Setup-1.0.5-arm64.exe",
             "CoBrowser-Windows-arm64-portable.zip"
           )
           foreach ($name in $expected) {
@@ -139,9 +139,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s release-assets/CoBrowser-Setup-1.0.1-x64.exe
+          test -s release-assets/CoBrowser-Setup-1.0.5-x64.exe
           test -s release-assets/CoBrowser-Windows-x64-portable.zip
-          test -s release-assets/CoBrowser-Setup-1.0.1-arm64.exe
+          test -s release-assets/CoBrowser-Setup-1.0.5-arm64.exe
           test -s release-assets/CoBrowser-Windows-arm64-portable.zip
           ls -lh release-assets
 
@@ -153,7 +153,7 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            release-assets/CoBrowser-Setup-1.0.1-x64.exe
+            release-assets/CoBrowser-Setup-1.0.5-x64.exe
             release-assets/CoBrowser-Windows-x64-portable.zip
-            release-assets/CoBrowser-Setup-1.0.1-arm64.exe
+            release-assets/CoBrowser-Setup-1.0.5-arm64.exe
             release-assets/CoBrowser-Windows-arm64-portable.zip

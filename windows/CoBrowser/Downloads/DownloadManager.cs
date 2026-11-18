@@ -25,7 +25,7 @@ public sealed class DownloadManager
     {
         _downloadDirectory = Path.GetFullPath(downloadDirectory);
         Directory.CreateDirectory(_downloadDirectory);
-        _historyPath = Path.Combine(Directory.GetParent(_downloadDirectory)?.FullName ?? _downloadDirectory, "download-history.json");
+        _historyPath = Path.Combine(App.DataRoot, "download-history.json");
         LoadCompletedHistory();
     }
 

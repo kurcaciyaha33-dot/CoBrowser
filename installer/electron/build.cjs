@@ -19,8 +19,13 @@ const payload = path.resolve(argValue('--payload', path.join(root, 'artifacts', 
 const destination = path.join(appDir, 'payload');
 const icon = path.join(appDir, 'assets', 'cobrowser.ico');
 
-if (!fs.existsSync(icon) || fs.statSync(icon).size < 1024) {
+if (!fs.existsSync(icon) || fs.statSync(icon).size < 4096) {
   console.error(`Installer icon is missing or invalid: ${icon}`);
+  process.exit(2);
+}
+const iconHeader = fs.readFileSync(icon).subarray(0, 6);
+if (iconHeader.readUInt16LE(0) !== 0 || iconHeader.readUInt16LE(2) !== 1 || iconHeader.readUInt16LE(4) < 1) {
+  console.error(`Installer icon is not a valid Windows ICO resource: ${icon}`);
   process.exit(2);
 }
 for (const file of ['CoBrowser.exe', 'libcef.dll', 'CefSharp.BrowserSubprocess.exe']) {
@@ -46,7 +51,9 @@ const packagePath = path.join(appDir, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 packageJson.build.icon = 'assets/cobrowser.ico';
 packageJson.build.win.icon = 'assets/cobrowser.ico';
-packageJson.build.portable.artifactName = `CoBrowser-Setup-1.0.1-${arch}.exe`;
+packageJson.build.win.signAndEditExecutable = true;
+packageJson.build.directories = { ...(packageJson.build.directories || {}), buildResources: 'assets' };
+packageJson.build.portable.artifactName = `CoBrowser-Setup-${packageJson.version}-${arch}.exe`;
 fs.writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
 
 const builder = path.join(appDir, 'node_modules', 'electron-builder', 'cli.js');
@@ -55,7 +62,7 @@ result = spawnSync(process.execPath, [builder, '--win', 'portable', `--${arch}`,
 });
 if (result.status !== 0) process.exit(result.status || 1);
 
-const expected = path.join(appDir, 'dist', `CoBrowser-Setup-1.0.1-${arch}.exe`);
+const expected = path.join(appDir, 'dist', `CoBrowser-Setup-${packageJson.version}-${arch}.exe`);
 if (!fs.existsSync(expected) || fs.statSync(expected).size === 0) {
   console.error(`electron-builder did not create expected installer: ${expected}`);
   process.exit(3);

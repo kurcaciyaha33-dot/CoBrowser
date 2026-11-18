@@ -36,7 +36,7 @@
         <Image Source="Assets/cobrowser-mark.png" Width="34" Height="34" Margin="0,0,12,0"/>
         <TextBlock Text="CoBrowser" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
       </StackPanel>
-      <TextBlock Text="VERSION 1.0.1" DockPanel.Dock="Right" Foreground="#9AA0A6" FontSize="10" VerticalAlignment="Center"/>
+      <TextBlock Text="VERSION 1.0.5" DockPanel.Dock="Right" Foreground="#9AA0A6" FontSize="10" VerticalAlignment="Center"/>
     </DockPanel>
 
     <!-- Sign-in card (Chrome layout, Bing accents) -->
@@ -116,7 +116,7 @@
                    FontSize="11.5" Foreground="#F2B8B5" TextWrapping="Wrap" />
       </Border>
       <DockPanel LastChildFill="False">
-        <TextBlock DockPanel.Dock="Left" Text="CoCo X Who?  •  CoBrowser 1.0.1" Foreground="#9AA0A6" FontSize="11" VerticalAlignment="Center"/>
+        <TextBlock DockPanel.Dock="Left" Text="CoCo X Who?  •  CoBrowser 1.0.5" Foreground="#9AA0A6" FontSize="11" VerticalAlignment="Center"/>
         <TextBlock DockPanel.Dock="Right" Text="Google email sign-in" Foreground="#9AA0A6" FontSize="11" VerticalAlignment="Center"/>
       </DockPanel>
     </StackPanel>

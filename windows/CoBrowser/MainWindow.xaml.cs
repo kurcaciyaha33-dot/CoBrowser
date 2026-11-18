@@ -43,7 +43,9 @@ public partial class MainWindow : Window
     private double _zoomLevel;
     private bool _googleLoginAcknowledged;
     private readonly GoogleOAuthService _authService;
-    private static readonly DownloadManager SharedDownloadManager = new(Path.Combine(App.DataRoot, "Downloads"));
+    private static readonly string UserDownloadsDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+    private static readonly DownloadManager SharedDownloadManager = new(UserDownloadsDirectory);
     private readonly DownloadManager _downloadManager = SharedDownloadManager;
     private readonly NotifyCollectionChangedEventHandler _downloadCollectionChanged;
     private GoogleUserProfile _googleUser;
@@ -168,13 +170,20 @@ public partial class MainWindow : Window
 
         var browser = new ChromiumWebBrowser { Address = "about:blank" };
         browser.DownloadHandler = new CoBrowserDownloadHandler(_downloadManager);
-        browser.RequestHandler = new CrashRecoveryRequestHandler(status => PostToUi(() =>
-        {
-            if (!IsLiveTabBrowser(tab, browser)) return;
-            if (Tabs.SelectedItem == tab)
-                StatusText.Text = "This page stopped unexpectedly. Press Reload to recover.";
-            App.Log($"Renderer recovery available for tab; termination status={status}");
-        }));
+        browser.RequestHandler = new CrashRecoveryRequestHandler(
+            status => PostToUi(() =>
+            {
+                if (!IsLiveTabBrowser(tab, browser)) return;
+                if (Tabs.SelectedItem == tab)
+                    StatusText.Text = "This page stopped unexpectedly. Press Reload to recover.";
+                App.Log($"Renderer recovery available for tab; termination status={status}");
+            }),
+            popupUrl => PostToUi(() =>
+            {
+                if (_isClosing || !IsLiveTabBrowser(tab, browser)) return;
+                AddTab(popupUrl);
+                App.Log($"Opened popup in new CoBrowser tab: {popupUrl}");
+            }));
         _browsers[tab] = browser;
         _views[tab] = browser;
         browser.Visibility = Visibility.Hidden;
@@ -970,7 +979,7 @@ public partial class MainWindow : Window
     private void ShowAbout()
     {
         MessageBox.Show(
-            "CoBrowser 1.0.1\nCreator: CoCo X Who?\nWindows engine: Chromium Embedded Framework (CEF) via CefSharp\nProfile: " + Path.Combine(App.DataRoot, "User Data") +
+            "CoBrowser 1.0.5\nCreator: CoCo X Who?\nWindows engine: Chromium Embedded Framework (CEF) via CefSharp\nProfile: " + Path.Combine(App.DataRoot, "User Data") +
             "\n\nText/source files open in the read-only code viewer. SVG/PNG and supported documents are rendered by Chromium. DLL/EXE files are inspected as binary and are never executed or decompiled by CoBrowser.\n\nLogs: " + App.LogPath,
             "About CoBrowser", MessageBoxButton.OK, MessageBoxImage.Information);
     }

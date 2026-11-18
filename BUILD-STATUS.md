@@ -1,4 +1,4 @@
-# CoBrowser 1.0.1 — Windows-only — build and verification status
+# CoBrowser 1.0.5 — Windows-only — build and verification status
 
 - Windows source: WPF + CefSharp/Chromium, original CoBrowser vector icon set, logo, multi-resolution ICO and embedded image resources.
 - Windows startup: staged diagnostics, explicit CEF lifecycle ownership, single-instance lock and persistent user profile.

@@ -4,5 +4,5 @@ namespace CoBrowser.Build;
 public static class BuildMarker
 {
     public const string Product = "CoBrowser";
-    public const string Version = "1.0.1";
+    public const string Version = "1.0.5";
 }

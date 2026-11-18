@@ -36,7 +36,7 @@ public partial class App : Application
             _startupStage = "Create CoBrowser data directory";
             Directory.CreateDirectory(DataRoot);
             Log("========== CoBrowser startup ==========");
-            Log($"Version=1.0.1; BaseDirectory={AppContext.BaseDirectory}; ProcessArchitecture={System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}; OS={Environment.OSVersion}");
+            Log($"Version=1.0.5; BaseDirectory={AppContext.BaseDirectory}; ProcessArchitecture={System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}; OS={Environment.OSVersion}");
 
             _startupStage = "Acquire single-instance lock";
             _instanceMutex = new Mutex(true, MutexName, out _ownsMutex);

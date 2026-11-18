@@ -3,7 +3,7 @@ using CefSharp.Handler;
 
 namespace CoBrowser.Downloads;
 
-/// <summary>Stores browser downloads in the user's CoBrowser Downloads directory.</summary>
+/// <summary>Writes Chromium downloads directly to the signed-in Windows user's Downloads folder.</summary>
 public sealed class CoBrowserDownloadHandler : DownloadHandler
 {
     private readonly DownloadManager _manager;
@@ -17,21 +17,21 @@ public sealed class CoBrowserDownloadHandler : DownloadHandler
         IBeforeDownloadCallback callback)
     {
         if (callback.IsDisposed) return false;
-
         try
         {
             var path = _manager.PrepareDownload(downloadItem);
-            callback.Continue(path, showDialog: false);
+            App.Log($"Accepting download: {downloadItem.SuggestedFileName} -> {path}");
+            using (callback)
+            {
+                callback.Continue(path, showDialog: false);
+            }
             return true;
         }
         catch (Exception ex)
         {
             App.LogException(ex, "Prepare browser download");
-            if (!callback.IsDisposed)
-            {
-                callback.Continue(downloadItem.SuggestedFileName, showDialog: true);
-                return true;
-            }
+            // Do not fall back to a relative filename/current working directory.
+            // A failed target selection is reported and the download is cancelled safely.
             return false;
         }
     }
@@ -42,7 +42,14 @@ public sealed class CoBrowserDownloadHandler : DownloadHandler
         DownloadItem downloadItem,
         IDownloadItemCallback callback)
     {
-        try { _manager.UpdateDownload(downloadItem); }
+        try
+        {
+            _manager.UpdateDownload(downloadItem);
+            if (downloadItem.IsComplete)
+                App.Log($"Download completed: {downloadItem.SuggestedFileName}; bytes={downloadItem.ReceivedBytes}");
+            else if (downloadItem.IsCancelled)
+                App.Log($"Download cancelled: {downloadItem.SuggestedFileName}");
+        }
         catch (Exception ex) { App.LogException(ex, "Update browser download progress"); }
     }
 }

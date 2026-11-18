@@ -1,4 +1,4 @@
-# CoBrowser 1.0.1 build (Windows-only)
+# CoBrowser 1.0.5 build (Windows-only)
 
 ## Windows browser EXE
 
@@ -26,7 +26,7 @@ Or build the installer separately after the browser EXE exists:
 dotnet build .\CoBrowser.sln -c Release -p:CoBrowserPlatform=Windows -p:BuildInstallerOnly=true
 ```
 
-Output: `artifacts/installer/CoBrowser-Setup-1.0.1.exe`. The portable browser remains separately available in `artifacts/windows/`.
+Output: `artifacts/installer/CoBrowser-Setup-1.0.5.exe`. The portable browser remains separately available in `artifacts/windows/`.
 
 ## Google OAuth (Windows)
 

@@ -90,6 +90,6 @@
       </Grid>
     </ScrollViewer>
 
-    <TextBlock Grid.Row="2" Text="CoBrowser 1.0.1" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <TextBlock Grid.Row="2" Text="CoBrowser 1.0.5" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
   </Grid>
 </UserControl>
