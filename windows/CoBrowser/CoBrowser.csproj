@@ -27,11 +27,12 @@
     <Resource Include="Assets\*.png" />
     <Resource Include="Assets\*.svg" />
   </ItemGroup>
-  <ItemGroup>
-    <!-- Publisher Desktop OAuth Client ID is injected from the build environment. The client secret is added
-         by the release workflow after publish; bundled desktop client secrets are not confidential. -->
+  <PropertyGroup>
+    <!-- MSBuild properties belong in PropertyGroup, not ItemGroup. OAuth values are supplied by GitHub Actions. -->
     <GoogleOAuthClientId Condition="'$(GoogleOAuthClientId)' == ''">$(GOOGLE_OAUTH_CLIENT_ID)</GoogleOAuthClientId>
     <GoogleOAuthClientSecret Condition="'$(GoogleOAuthClientSecret)' == ''">$(GOOGLE_OAUTH_CLIENT_SECRET)</GoogleOAuthClientSecret>
+  </PropertyGroup>
+  <ItemGroup>
     <None Update="google-oauth.json" Condition="Exists('google-oauth.json')" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
