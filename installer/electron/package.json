@@ -39,10 +39,12 @@
       "icon": "assets/cobrowser.ico",
       "target": [
         "portable"
-      ]
+      ],
+      "signAndEditExecutable": true
     },
     "portable": {
-      "artifactName": "CoBrowser-Setup-${version}.exe"
-    }
+      "artifactName": "CoBrowser-Setup-${version}-${arch}.exe"
+    },
+    "icon": "assets/cobrowser.ico"
   }
 }

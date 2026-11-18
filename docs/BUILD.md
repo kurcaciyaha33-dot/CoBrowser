@@ -40,4 +40,4 @@ Alternatively set `GOOGLE_OAUTH_CLIENT_ID` or provide `windows/CoBrowser/google-
 
 ## GitHub Actions
 
-`.github/workflows/build.yml` builds the Windows x64 portable package and Electron installer, and can publish those two artifacts to a GitHub Release. The workflow has only Windows build and release artifacts.
+`.github/workflows/build.yml` builds the Windows x64 and ARM64 portable package and Electron installer, and can publish those two artifacts to a GitHub Release. The workflow has only Windows build and release artifacts.

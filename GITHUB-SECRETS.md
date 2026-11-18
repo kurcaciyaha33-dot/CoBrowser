@@ -1,14 +1,17 @@
-# GitHub Actions secrets for CoBrowser Windows releases
+# GitHub Actions Secrets
 
-Add these repository secrets under **Settings → Secrets and variables → Actions**:
+Required repository secrets for the current Windows x64 + ARM64 release workflow:
 
-- `GOOGLE_OAUTH_CLIENT_ID`: OAuth 2.0 Client ID created for a Google **Desktop app**.
-- `GOOGLE_OAUTH_CLIENT_SECRET`: matching OAuth 2.0 Client Secret for that Desktop app.
+- `GOOGLE_OAUTH_CLIENT_ID` — Google OAuth Desktop app client ID.
+- `GOOGLE_OAUTH_CLIENT_SECRET` — Desktop app client secret used by the current CoBrowser OAuth implementation.
 
-The `CoBrowser Build & Release` workflow requires both values. On a tag push (`v*`) or manual workflow run, it publishes the Windows x64 browser, writes `google-oauth.json` into the publish output, packages the Electron setup executable, and creates a portable ZIP.
+The workflow creates both architectures and packages four release assets:
 
-## Important security note
+- `CoBrowser-Setup-1.0.1-x64.exe`
+- `CoBrowser-Windows-x64-portable.zip`
+- `CoBrowser-Setup-1.0.1-arm64.exe`
+- `CoBrowser-Windows-arm64-portable.zip`
 
-GitHub Actions encrypts repository secrets while stored by GitHub and masks them in normal logs. This does **not** keep a value secret after a workflow embeds it in a public installer or portable archive. Anyone who downloads a public desktop app can inspect its files or runtime and recover bundled credentials, even if the value is encrypted with a key shipped in the same app.
+Security note: GitHub Actions encrypts repository secrets at rest, but this workflow places the OAuth credential JSON into the published application payload so the public app can use it. Anyone who downloads and inspects the EXE/ZIP can recover those values. Obfuscation or encrypting the JSON with a key embedded in the app does not make a client secret confidential. For a genuinely confidential credential, use a backend that keeps the secret server-side.
 
-Google Desktop OAuth credentials are for installed/public clients and must not be treated as confidential server credentials. Do not reuse this value as a password or as a credential protecting private APIs. Use a backend-held secret for any genuinely confidential operation.
+The ARM64 publish also requires every native dependency (especially CefSharp/CEF) to ship Windows ARM64 assets. If the dependency does not support `win-arm64`, the ARM64 job will fail at `dotnet publish`; do not relabel an x64 binary as ARM64.
